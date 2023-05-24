@@ -166,7 +166,7 @@ function SingIn(): JSX.Element {
                         component={TouchableOpacity} className='flex mx-6 bg-primary py-4 rounded-full'
                     >
                         <StyledText className='flex text-center text-white text-body-large font-u-bold'>
-                            Continue
+                            Continue Login
                         </StyledText>
                     </StyledComponent>
                 </StyledView>
