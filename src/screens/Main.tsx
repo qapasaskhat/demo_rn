@@ -11,7 +11,7 @@ import {
   Dimensions
 } from 'react-native';
 
-import { StyledComponent, styled } from 'nativewind'
+import { StyledComponent, styled, useColorScheme } from 'nativewind'
 
 const { width, height } = Dimensions.get('screen')
 const StyledText = styled(Text)
@@ -19,13 +19,15 @@ const StyledView = styled(View)
 const StyledInput = styled(TextInput)
 
 function Main(): JSX.Element {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+
   const mtop = Platform.OS === 'ios' ? 14 : 0
 
   const [ value, setValue ] = React.useState(0)
 
   const offset = React.useRef(new Animated.Value(0)).current
 
-  const headerHeight = offset.interpolate({
+  const headerHeight = __DEV__ ? height/3 : offset.interpolate({
     inputRange: [0, height/3 ],
     outputRange: [ height/3, 0 ],
     extrapolate: 'clamp'
@@ -81,18 +83,18 @@ function Main(): JSX.Element {
             </StyledView>
           </StyledView>
         </Animated.View>
-        
+{/*         
         <Animated.View style={{
           marginTop: headerHeight,
           flex: 1,
-          backgroundColor: '#fff',
+          backgroundColor: colorScheme === 'light' ? '#fff' : '#000',
           borderRadius: 24,
           padding: 32
-        }}>
+        }}> */}
         <StyledComponent 
           component={View} 
-          // className='flex-1 bg-white p-5 rounded-t-3xl pr-8' 
-          // style={{ marginTop: height/3 }}
+          className='flex-1 bg-white p-5 rounded-t-3xl pr-8 dark:bg-black' 
+          style={{ marginTop: height/3 }}
         >
           <Animated.ScrollView
             showsVerticalScrollIndicator={false}
@@ -105,18 +107,18 @@ function Main(): JSX.Element {
           >
           <StyledView className=' flex-row items-center justify-between'>
             <StyledView>
-              <StyledText className='font-extrabold mb-2 text-xl'>
+              <StyledText className='font-extrabold mb-2 text-xl dark:text-white'>
                 Earn up 5.00% Discount
               </StyledText>
-              <StyledText>
+              <StyledText className=' dark:text-white'>
                 Pay with Bitcoint and enjoy a limited {'\n'}time discount!
               </StyledText>
             </StyledView>
-            <StyledView className=' flex bg-orange-100 w-11 h-11 rounded-full'/>
+            <StyledView className=' flex bg-orange-100 w-11 h-11 rounded-full dark:bg-orange-50'/>
           </StyledView>
           <StyledView className=' w-full h-px bg-gray-300 my-5' />
           
-          <StyledText className=' font-bold text-lg'>
+          <StyledText className=' font-bold text-lg dark:text-white'>
             Wacthlist
           </StyledText>
           {
@@ -126,21 +128,21 @@ function Main(): JSX.Element {
                   <StyledView className=' flex-row items-center w-1/3'>
                     <StyledView className=' w-10 h-10 rounded-full bg-green-100 mr-4' />
                     <StyledView>
-                      <StyledText className=' font-semibold'>
+                      <StyledText className=' font-semibold dark:text-white'>
                         {item?.name}
                       </StyledText>
-                      <StyledText>
+                      <StyledText className=' dark:text-white'>
                         {item?.short}
                       </StyledText>
                     </StyledView>
                   </StyledView>
                   <StyledView>
-                    <StyledText>
+                    <StyledText className=' dark:text-white'>
                       graph
                     </StyledText>
                   </StyledView>
                   <StyledView>
-                    <StyledText className=' font-medium'>
+                    <StyledText className=' font-medium dark:text-white'>
                       SGD {item?.price}
                     </StyledText>
                     <StyledText className=' text-red-500 font-medium text-right'>
@@ -153,7 +155,7 @@ function Main(): JSX.Element {
           }
         </Animated.ScrollView>
         </StyledComponent>
-        </Animated.View>
+        {/* </Animated.View> */}
       </StyledView>
   );
 }
