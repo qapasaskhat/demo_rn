@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-    View, Text, TextInput, TouchableOpacity, SafeAreaView, FlatList, Animated
+    View, Text, TextInput, TouchableOpacity, SafeAreaView, FlatList, Animated, Platform, Alert
 } from 'react-native'
 
-import { styled, StyledComponent } from 'nativewind'
+import { styled, StyledComponent, useColorScheme } from 'nativewind'
 import VectorImage from "react-native-vector-image";
 import Modal from 'react-native-modal'
+
+import clsx from "clsx";
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
@@ -50,24 +52,51 @@ interface ICode {
     confirm: any
 }
 
+interface CodeProps {
+    code: number[]
+}
+
+const numbers: number[] = [1,2,3,4,5,6,7,8,9,11,0,12]
 
 function SingIn(): JSX.Element {
     
     const [ email, setEmail ] = React.useState('')
-
     const [ phone, setPhone ] = React.useState('')
-
     const [ isVisible, setVisible ] = React.useState(false)
-
+    const [ code, setCode ] = React.useState<number[]>([])
     const [confirm, setConfirm] = useState<ICode>();
+
+    const [secs, setSecs] = useState(60)
+
+    useEffect(() => {
+        const timerId = setInterval(() => {
+            if (secs <= 0) {}
+            else setSecs(s => s - 1)
+        }, 1000)
+        return () => clearInterval(timerId);
+    }, [secs])
 
     const validateEmail = (email: string) => {
         return String(email)
-          .toLowerCase()
-          .match(
+            .toLowerCase()
+            .match(
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          );
-      };
+        );
+    };
+
+    const enterCode = (key: number) => {
+        if(key === 12){
+            setCode(code.slice(0, -1))
+            return
+        }
+        if(code.length === 4 || key === 11){
+            return
+        }
+        let n_code: number[] = [...code, key]
+        setCode(n_code)
+    }
+
+    const { colorScheme, toggleColorScheme } = useColorScheme()
 
     if(!confirm){
         return(
@@ -83,22 +112,39 @@ function SingIn(): JSX.Element {
                 </StyledView>
                 <StyledView className='flex flex-1 justify-around'>
                     <StyledView>
-                        <StyledText className='flex text-gray-scale-900  text-heading-3 mx-6 font-u-bold dark:text-white'>
-                            You’ve got SMS 📩
+                        <StyledText className='flex text-gray-scale-900 text-heading-3 mx-6 font-u-bold dark:text-white'>
+                            You’ve got mail 📩
                         </StyledText>
                         <StyledText className="flex text-body-xlarge font-u-regular text-gray-scale-900 dark:text-white mx-6 mt-3">
-                            We have sent the OTP verification code to your phone number. 
-                            Check your sms and enter the code below.
+                            We have sent the OTP verification code to your email address. 
+                            Check your email and enter the code below.
                         </StyledText>
                     </StyledView>
-                    <StyledView className="flex flex-row justify-between mx-4">
+                    <StyledView className="flex flex-row justify-between mx-4 items-center h-20">
                         {
-                            new Array(6).fill({ id: 1 }).map((_, index)=>{
+                            new Array(4).fill({ id: 1 }).map((_, index)=>{
                                 return(
-                                    <StyledView key={index.toString()} className="flex h-14 w-[15%] bg-gray-scale-50 border border-gray-scale-200 rounded-2xl items-center justify-center dark:bg-dark-2">
-                                        <StyledText className="flex text-heading-4 text-gray-scale-900 dark:text-white font-u-bold" >
-                                            1
-                                        </StyledText>
+                                    <StyledView 
+                                        key={index.toString()} 
+                                        className={clsx(
+                                                "flex h-16 w-[22%]  rounded-2xl border border-gray-scale-200 dark:border-dark-3",
+                                                code.length === index+1 && typeof(code[index]) === 'number' && " border-primary ",
+                                                typeof(code[index]) !== 'number' && "h-14"
+                                            )}
+                                    >
+                                        <StyledView className={
+                                            clsx(
+                                                'rounded-2xl flex-grow w-full items-center justify-center  bg-gray-scale-50 dark:bg-dark-2',
+                                                code.length === index+1 && typeof(code[index]) === 'number'  && "bg-green-t-8",
+                                            )
+                                        }>
+                                            <StyledText className="flex text-heading-4 text-gray-scale-900 dark:text-white font-u-bold" >
+                                                {
+                                                    typeof(code[index]) === 'number' ? code[index] : ''
+                                                    // code.length === index+1 && typeof(code[index]) === 'number' && " bg-green-t-8",
+                                                }
+                                            </StyledText>
+                                        </StyledView>
                                     </StyledView>
                                 )
                             })
@@ -109,12 +155,15 @@ function SingIn(): JSX.Element {
                             Didn't receive email? 
                         </StyledText>
                         <StyledText className="flex text-center text-gray-scale-900 dark:text-white text-body-xlarge font-u-medium">
-                            You can resend code in 55 s
+                            You can resend code in
+                            <StyledText className="text-primary"> {secs} </StyledText>
+                            second
                         </StyledText>
                     </StyledView>
                     <StyledComponent 
-                        onPress={()=>{ }}
-                        component={TouchableOpacity} className='flex mx-6 bg-primary py-4 rounded-full shadow shadow-primary-200 dark:shadow-primary-300'
+                        onPress={()=>{ console.log(code.join('')) }}
+                        disabled={code.length !== 4}
+                        component={TouchableOpacity} className='flex mx-6 bg-primary py-4 rounded-full'
                     >
                         <StyledText className='flex text-center text-white text-body-large font-u-bold'>
                             Continue
@@ -123,20 +172,32 @@ function SingIn(): JSX.Element {
                 </StyledView>
                 <StyledView className="flex bg-gray-scale-50 dark:bg-dark-2">
                     <FlatList 
-                        data={[1,2,3,4,5,6,7,8,9,'*',0,12]}
+                        data={numbers}
                         numColumns={3}
                         bounces={false}
+                        keyExtractor={(_, index) => index.toString()}
                         renderItem={({item, index})=>{
                             return(
-                                <StyledComponent component={TouchableOpacity} className="flex w-1/3 h-16 items-center justify-center">
-                                    <StyledText className="flex text-gray-scale-900 dark:text-white font-u-medium text-2xl">
-                                        {item}
+                                <StyledComponent 
+                                    onPress={()=> enterCode(item)}
+                                    key={index.toString()}
+                                    component={TouchableOpacity} 
+                                    className={clsx('flex w-1/3 h-16 items-center justify-center bg-gray-scale-50 dark:bg-dark-2')}
+                                >
+                                    <StyledText className={
+                                        clsx(
+                                            "flex text-gray-scale-900 dark:text-white font-u-medium text-2xl",
+                                            item === 12 && "text-base"
+                                        )
+                                    }>
+                                        {item === 12 ? 'delete' : item === 11 ? '*' : item}
                                     </StyledText>
                                 </StyledComponent>
                             )
                         }}
                     />
                 </StyledView>
+                { Platform.OS === 'ios' && <StyledView className="bg-gray-scale-50 dark:bg-dark-2 h-16 w-screen absolute -bottom-6" />}
             </StyledComponent>
         )
     }
