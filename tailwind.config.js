@@ -54,6 +54,13 @@ module.exports = {
         'brown': '#795548',
         'blue-grey': '#607D8B',
 
+        'dark-mode-gray': '#323C51',
+        'gray-dark': '#6B7280',
+        'blue-1': '#2545A0',
+        'green-1': '#00FFB2',
+        'dark-33': '#121425',
+
+        'accent': '#22D3EE'
       },
       fontSize:{
         "heading-1": [
@@ -97,6 +104,8 @@ module.exports = {
         "body-medium": '14px',
         "body-small": '12px',
         "body-xsmal": '10px',
+
+        "body-xxsmall": '7px'
       },
       fontFamily: {
         "u-bold": "Urbanist-Bold",
