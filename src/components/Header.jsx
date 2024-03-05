@@ -1,6 +1,6 @@
 import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
 
-export default function Header() {
+export default function Header({title = 'Haader'}) {
     return <View style={{
         height: 56,
         flexDirection: 'row',
@@ -14,7 +14,9 @@ export default function Header() {
         <View style={{ flexGrow: 1 }}>
             <Text style={{
                 textAlign: 'center'
-            }}>Header</Text>
+            }}>
+                {title}
+            </Text>
         </View>
     </View>
 }
